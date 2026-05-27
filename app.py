@@ -24,26 +24,29 @@ st.set_page_config(
 )
 
 # ============================
-# 模型加载 (缓存, 避免重复加载)
+# LOAD PIPELINES
 # ============================
-# ⚠️ 老师要求: 用 @st.cache_resource 缓存 pipeline
+# use @st.cache_resource to cache pipeline
 
 @st.cache_resource
-def load_behavior_classifier():
-    """加载 Pipeline A: 宠物行为分类模型 (微调后的 ViT)"""
-    # ⚠️ 替换为你的 HF 模型仓库名
+def load_breed_classifier():
+    """Load Pipeline A: Breed Recognition (pretrained ViT)"""
+    return hf_pipeline("image-classification", model="wesleyacheng/dog-breeds-multiclass-image-classification-with-vit")
+
+@st.cache_resource
+def load_emotion_classifier():
+    """Load Pipeline B: Emotion Detection (fine-tuned ViT)"""
     return pipeline(
         "image-classification",
-        model="YOUR_USERNAME/chewy-pet-behavior-vit",
+        model="Bonnnz/CustomModel_dogemotion",
     )
 
-@st.cache_resource
 def load_recommendation_generator():
-    """加载 Pipeline B: 产品推荐生成模型 (Flan-T5)"""
+    """Load Pipeline C: product recommendation generator (bart-base)"""
     return pipeline(
         "text2text-generation",
-        model="google/flan-t5-small",
-        max_length=200,
+        model="facebook/bart-base",
+        max_length=150,
     )
 
 
