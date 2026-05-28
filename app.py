@@ -7,7 +7,7 @@
 # Pipeline:
 #     Pipeline A: image-classification (ViT, pre-trained) -> Breed Recognition
 #     Pipeline B: image-classification (ViT, fine-tuned) -> Emotion Detection
-#     Pipeline C: text2text-generation (bart-base, prompt engineering) -> Product Recommendation
+#     Pipeline C: text2text-generation (flan-t5-base, prompt engineering) -> Product Recommendation
 # =============================================================================
 
 import streamlit as st
