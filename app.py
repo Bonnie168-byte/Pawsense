@@ -300,24 +300,13 @@ def main():
             </div>
         </div>""", unsafe_allow_html=True)
 
-    # Technical Details
-    with st.expander("ℹ️ Technical Details"):
-        st.markdown(f"""
-        - **Pipeline A** (Breed Recognition): Pretrained ViT — {time_a:.2f}s
-        - **Pipeline B** (Emotion Detection): Fine-tuned ViT — {time_b:.2f}s
-        - **Pipeline C** (Recommendation): bart-base + prompt engineering — {time_c:.2f}s
-        - **Breed**: {breed} ({breed_conf*100:.1f}%)
-        - **Behavior**: {behavior} ({behavior_conf*100:.1f}%)
-        - **Size category**: {size}
-        """)
-
-    # Footer
-    st.markdown("---")
-    st.markdown("""<div class="footer">
-        ⚠️ PawSense detects observable behavioral patterns only and does not constitute veterinary advice.<br>
-        Please consult a professional veterinarian for health concerns.<br><br>
-        <strong>PawSense</strong> — Understand your dog. Love them better. 🐾
-    </div>""", unsafe_allow_html=True)
+# Footer
+st.markdown("---")
+st.markdown("""<div class="footer">
+    ⚠️ PawSense detects observable behavioral patterns only and does not constitute veterinary advice.<br>
+    Please consult a professional veterinarian for health concerns.<br><br>
+    <strong>PawSense</strong> — Understand your dog. Love them better. 🐾
+</div>""", unsafe_allow_html=True)
 
 # ============================
 # Entry
