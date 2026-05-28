@@ -1,12 +1,13 @@
 # =============================================================================
 # ISOM5240 Group Project - Streamlit App
-# Chewy Pet Behavior Detection & Personalized Recommendation
+# PawSense — AI-Powered Dog Behavior Detection & Product Recommendation
 # =============================================================================
 # 
 # Deploy: Streamlit Cloud (Link GitHub Repo)
 # Pipeline:
-#   Pipeline A: image-classification (ViT, fine-tuned)
-#   Pipeline B: text2text-generation (Flan-T5, prompt engineering)
+#   Pipeline A: image-classification (ViT, pre-trained) -> Breed Recognition
+#   Pipeline B: image-classification (ViT, fine-tuned) -> Emotion Detection
+#   Pipeline C: text2text-generation (bart-base, prompt engineering) -> Product Recommendation
 # =============================================================================
 
 import streamlit as st
@@ -15,13 +16,49 @@ from PIL import Image
 import time
 
 # ============================
-# Page Config (必须放在最前面)
+# Page Config
 # ============================
 st.set_page_config(
-    page_title="Chewy Pet Behavior AI",
+    page_title="PawSense",
     page_icon="🐾",
     layout="wide",
 )
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CUSTOM CSS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+html, body, [class*="css"] { font-family: 'Nunito', sans-serif; }
+.block-container { max-width: 1100px; padding-top: 2rem; }
+.hero-title { font-size: 2.4rem; font-weight: 800; color: #6C3FC5; margin-bottom: 0.2rem; }
+.hero-sub { font-size: 1.05rem; color: #888; margin-bottom: 1.5rem; }
+.upload-box { border: 2px dashed #D1C4E9; border-radius: 16px; padding: 2.5rem 1rem; text-align: center; background: #FAF7FF; }
+.result-card { background: #fff; border: 1px solid #EDE7F6; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(108,63,197,0.06); }
+.result-label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.result-value { font-size: 1.4rem; font-weight: 700; color: #333; }
+.confidence-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; }
+.emo-happy   { background: #E8F5E9; color: #2E7D32; }
+.emo-sad     { background: #E3F2FD; color: #1565C0; }
+.emo-angry   { background: #FFEBEE; color: #C62828; }
+.emo-relaxed { background: #F3E5F5; color: #7B1FA2; }
+.score-row { display: flex; align-items: center; margin: 6px 0; }
+.score-label { width: 80px; font-size: 0.85rem; color: #666; }
+.score-bar-bg { flex: 1; height: 10px; background: #F3F0FA; border-radius: 5px; overflow: hidden; }
+.score-bar { height: 100%; border-radius: 5px; transition: width .6s ease; }
+.product-card { background: #fff; border: 1px solid #EDE7F6; border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(108,63,197,0.05); }
+.product-rank { width: 32px; height: 32px; border-radius: 50%; background: #7C4DFF; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+.product-info { flex: 1; }
+.product-name { font-weight: 700; color: #333; font-size: 0.95rem; }
+.product-reason { font-size: 0.82rem; color: #888; margin-top: 2px; }
+.product-meta { text-align: right; }
+.product-price { font-weight: 700; color: #6C3FC5; font-size: 1rem; }
+.product-cat { font-size: 0.72rem; color: #aaa; }
+section[data-testid="stSidebar"] { background: #F8F5FF; }
+.footer { text-align: center; color: #bbb; font-size: 0.8rem; margin-top: 3rem; padding: 1rem 0; border-top: 1px solid #F0ECF7; }
+</style>
+""", unsafe_allow_html=True)
 
 # ============================
 # LOAD PIPELINES
