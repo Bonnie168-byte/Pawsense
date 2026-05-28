@@ -4,8 +4,6 @@
 
 > Upload a photo of your dog — PawSense identifies the breed, detects behavioral state, and recommends the perfect products from [Chewy.com](https://www.chewy.com).
 
-[![Streamlit App]([https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pawsense.streamlit.app](https://paw-sense.streamlit.app/))
-
 ---
 
 ## 📌 Project Overview
