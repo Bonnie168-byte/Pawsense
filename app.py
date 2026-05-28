@@ -127,7 +127,7 @@ def get_products(behavior, top_n=3):
 @st.cache_resource
 def load_breed_classifier():
     """Pipeline A: Breed Recognition (pretrained ViT)"""
-    return pipeline("image-classification", model="wesleyacheng/dog-breeds-multiclass-image-classification-with-vit")
+    return pipeline("image-classification", model="skyau/dog-breed-classifier-vit")
 
 @st.cache_resource
 def load_emotion_classifier():
