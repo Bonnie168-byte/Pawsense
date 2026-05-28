@@ -210,7 +210,7 @@ def main():
         st.markdown("**Course:** ISOM5240 Group Project")
 
     # Hero Title
-    st.markdown('<div class="hero-title">PawSense — Know Your Dog Better 🐾</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">AI-Powered Dog Emotion Detection & Product Recommendation 🐾</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-sub">Upload a photo of your dog — AI will identify the breed, read their mood, and recommend the perfect products from Chewy.com.</div>', unsafe_allow_html=True)
 
     # Image Upload
