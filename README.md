@@ -17,7 +17,7 @@
 
 ### Business Objective (≤ 50 words)
 
-> This project aims to detect dog behavioral states from images using deep learning, enabling personalized product recommendations and improving customer retention for pet e-commerce platforms like Chewy.com.
+> This project aims to detect dog emotion states from images using deep learning, enabling personalized product recommendations and improving customer retention for pet e-commerce platforms like Chewy.com.
 
 ---
 
