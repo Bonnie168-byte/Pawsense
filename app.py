@@ -188,7 +188,7 @@ def main():
 
     if uploaded_file is None:
         st.info("💡 Tip: A clear front-facing photo gives the best results!")
-        return
+    else:
 
     # Process image
     image = Image.open(uploaded_file).convert("RGB")
