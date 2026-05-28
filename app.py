@@ -188,117 +188,117 @@ def main():
 
     if uploaded_file is None:
         st.info("💡 Tip: A clear front-facing photo gives the best results!")
-    else:
+        return
 
-        # Process image
-        image = Image.open(uploaded_file).convert("RGB")
-        col_img, col_result = st.columns([1, 1], gap="large")
-    
-        with col_img:
-            st.image(image, caption="Your dog's photo", use_container_width=True)
-    
-        with col_result:
-            with st.spinner("🔍 Analyzing your dog..."):
-                # Load all 3 pipelines
-                breed_clf = load_breed_classifier()
-                emotion_clf = load_emotion_classifier()
-                rec_gen = load_recommendation_generator()
-    
-                # Pipeline A: Breed
-                start_a = time.time()
-                breed, breed_conf, breed_top3 = classify_breed(image, breed_clf)
-                time_a = time.time() - start_a
-    
-                # Pipeline B: Emotion
-                start_b = time.time()
-                behavior, behavior_conf, all_behaviors = classify_emotion(image, emotion_clf)
-                time_b = time.time() - start_b
-    
-            meta = BEHAVIOR_META.get(behavior, BEHAVIOR_META["happy"])
-            size = get_size(breed)
-    
-            # Breed card
-            st.markdown(f"""<div class="result-card">
-                <div class="result-label">🐕 Dog Breed</div>
-                <div class="result-value">{breed}
-                    <span class="confidence-badge" style="background:#F3E5F5;color:#6C3FC5;">{breed_conf*100:.1f}% confidence</span>
-                </div>
-                <div style="font-size:0.85rem;color:#999;margin-top:4px;">Size category: {size}</div>
-            </div>""", unsafe_allow_html=True)
-    
-            # Show top 3 breeds if confidence is low
-            if breed_conf < 0.5:
-                with st.expander("🔍 Other possible breeds"):
-                    for r in breed_top3:
-                        name = r["label"].replace("_", " ")
-                        st.write(f"- {name}: {r['score']*100:.1f}%")
-    
-            # Emotion card
-            st.markdown(f"""<div class="result-card">
-                <div class="result-label">🧠 Behavior State</div>
-                <div class="result-value">
-                    <span style="font-size:1.8rem;vertical-align:middle;">{meta['emoji']}</span>
-                    <span style="color:{meta['color']};vertical-align:middle;">{behavior.capitalize()}</span>
-                    <span class="confidence-badge {meta['css']}">{behavior_conf*100:.1f}%</span>
-                </div>
-                <div style="font-size:0.85rem;color:#666;margin-top:6px;">{meta['desc']}</div>
-            </div>""", unsafe_allow_html=True)
-    
-        # Emotion Score Breakdown
-        st.markdown("### 📊 Emotion Analysis")
-        sc1, sc2 = st.columns([1.2, 1])
-    
-        with sc1:
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            st.markdown('<div class="result-label">Behavior Confidence Scores</div>', unsafe_allow_html=True)
-            for r in all_behaviors:
-                m = BEHAVIOR_META.get(r["label"], BEHAVIOR_META["happy"])
-                pct = r["score"] * 100
-                st.markdown(f"""<div class="score-row">
-                    <span class="score-label">{m['emoji']} {r['label'].capitalize()}</span>
-                    <div class="score-bar-bg"><div class="score-bar" style="width:{pct}%;background:{m['bar']};"></div></div>
-                    <span style="width:55px;text-align:right;font-size:0.85rem;font-weight:600;color:#555;">{pct:.1f}%</span>
-                </div>""", unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-    
-        with sc2:
-            st.markdown(f"""<div class="result-card" style="text-align:center;padding:1.5rem;">
-                <div style="font-size:3.5rem;">{meta['emoji']}</div>
-                <div style="font-size:2rem;font-weight:800;color:{meta['color']};margin:0.3rem 0;">{behavior.capitalize()}</div>
-                <div style="font-size:0.9rem;color:#999;">Detected behavior state</div>
-            </div>""", unsafe_allow_html=True)
-    
-        # Pipeline C: AI Product Recommendation
-        st.markdown("---")
-        st.markdown("### 💬 AI Behavior Insight")
-    
-        products = get_products(behavior)
-    
-        with st.spinner("💡 Generating personalized insight..."):
-            start_c = time.time()
-            rec_text = generate_recommendation(breed, behavior, products, rec_gen)
-            time_c = time.time() - start_c
-    
-        st.markdown(f"""<div class="result-card" style="border-left:4px solid {meta['color']};">
-            <div style="font-size:0.95rem;line-height:1.7;color:#444;">{rec_text}</div>
+    # Process image
+    image = Image.open(uploaded_file).convert("RGB")
+    col_img, col_result = st.columns([1, 1], gap="large")
+
+    with col_img:
+        st.image(image, caption="Your dog's photo", use_container_width=True)
+
+    with col_result:
+        with st.spinner("🔍 Analyzing your dog..."):
+            # Load all 3 pipelines
+            breed_clf = load_breed_classifier()
+            emotion_clf = load_emotion_classifier()
+            rec_gen = load_recommendation_generator()
+
+            # Pipeline A: Breed
+            start_a = time.time()
+            breed, breed_conf, breed_top3 = classify_breed(image, breed_clf)
+            time_a = time.time() - start_a
+
+            # Pipeline B: Emotion
+            start_b = time.time()
+            behavior, behavior_conf, all_behaviors = classify_emotion(image, emotion_clf)
+            time_b = time.time() - start_b
+
+        meta = BEHAVIOR_META.get(behavior, BEHAVIOR_META["happy"])
+        size = get_size(breed)
+
+        # Breed card
+        st.markdown(f"""<div class="result-card">
+            <div class="result-label">🐕 Dog Breed</div>
+            <div class="result-value">{breed}
+                <span class="confidence-badge" style="background:#F3E5F5;color:#6C3FC5;">{breed_conf*100:.1f}% confidence</span>
+            </div>
+            <div style="font-size:0.85rem;color:#999;margin-top:4px;">Size category: {size}</div>
         </div>""", unsafe_allow_html=True)
-    
-        # Product Cards
-        st.markdown(f"### 🛒 Recommended Products for Your {breed}")
-        st.caption(f"Curated based on **{behavior}** behavior state and **{size.lower()}** dog size")
-    
-        for i, p in enumerate(products):
-            st.markdown(f"""<div class="product-card">
-                <div class="product-rank">{i+1}</div>
-                <div class="product-info">
-                    <div class="product-name">{p['name']}</div>
-                    <div class="product-reason">{p['reason']}</div>
-                </div>
-                <div class="product-meta">
-                    <div class="product-price">${p['price']:.2f}</div>
-                    <div class="product-cat">{p['category']}</div>
-                </div>
+
+        # Show top 3 breeds if confidence is low
+        if breed_conf < 0.5:
+            with st.expander("🔍 Other possible breeds"):
+                for r in breed_top3:
+                    name = r["label"].replace("_", " ")
+                    st.write(f"- {name}: {r['score']*100:.1f}%")
+
+        # Emotion card
+        st.markdown(f"""<div class="result-card">
+            <div class="result-label">🧠 Behavior State</div>
+            <div class="result-value">
+                <span style="font-size:1.8rem;vertical-align:middle;">{meta['emoji']}</span>
+                <span style="color:{meta['color']};vertical-align:middle;">{behavior.capitalize()}</span>
+                <span class="confidence-badge {meta['css']}">{behavior_conf*100:.1f}%</span>
+            </div>
+            <div style="font-size:0.85rem;color:#666;margin-top:6px;">{meta['desc']}</div>
+        </div>""", unsafe_allow_html=True)
+
+    # Emotion Score Breakdown
+    st.markdown("### 📊 Emotion Analysis")
+    sc1, sc2 = st.columns([1.2, 1])
+
+    with sc1:
+        st.markdown('<div class="result-card">', unsafe_allow_html=True)
+        st.markdown('<div class="result-label">Behavior Confidence Scores</div>', unsafe_allow_html=True)
+        for r in all_behaviors:
+            m = BEHAVIOR_META.get(r["label"], BEHAVIOR_META["happy"])
+            pct = r["score"] * 100
+            st.markdown(f"""<div class="score-row">
+                <span class="score-label">{m['emoji']} {r['label'].capitalize()}</span>
+                <div class="score-bar-bg"><div class="score-bar" style="width:{pct}%;background:{m['bar']};"></div></div>
+                <span style="width:55px;text-align:right;font-size:0.85rem;font-weight:600;color:#555;">{pct:.1f}%</span>
             </div>""", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with sc2:
+        st.markdown(f"""<div class="result-card" style="text-align:center;padding:1.5rem;">
+            <div style="font-size:3.5rem;">{meta['emoji']}</div>
+            <div style="font-size:2rem;font-weight:800;color:{meta['color']};margin:0.3rem 0;">{behavior.capitalize()}</div>
+            <div style="font-size:0.9rem;color:#999;">Detected behavior state</div>
+        </div>""", unsafe_allow_html=True)
+
+    # Pipeline C: AI Product Recommendation
+    st.markdown("---")
+    st.markdown("### 💬 AI Behavior Insight")
+
+    products = get_products(behavior)
+
+    with st.spinner("💡 Generating personalized insight..."):
+        start_c = time.time()
+        rec_text = generate_recommendation(breed, behavior, products, rec_gen)
+        time_c = time.time() - start_c
+
+    st.markdown(f"""<div class="result-card" style="border-left:4px solid {meta['color']};">
+        <div style="font-size:0.95rem;line-height:1.7;color:#444;">{rec_text}</div>
+    </div>""", unsafe_allow_html=True)
+
+    # Product Cards
+    st.markdown(f"### 🛒 Recommended Products for Your {breed}")
+    st.caption(f"Curated based on **{behavior}** behavior state and **{size.lower()}** dog size")
+
+    for i, p in enumerate(products):
+        st.markdown(f"""<div class="product-card">
+            <div class="product-rank">{i+1}</div>
+            <div class="product-info">
+                <div class="product-name">{p['name']}</div>
+                <div class="product-reason">{p['reason']}</div>
+            </div>
+            <div class="product-meta">
+                <div class="product-price">${p['price']:.2f}</div>
+                <div class="product-cat">{p['category']}</div>
+            </div>
+        </div>""", unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
