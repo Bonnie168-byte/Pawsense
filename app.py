@@ -123,18 +123,18 @@ def load_emotion_classifier():
 
 @st.cache_resource
 def load_recommendation_generator():
-    """Pipeline C: Product Recommendation (bart-base)"""
-    return pipeline("text2text-generation", model="facebook/bart-base", max_new_tokens=150)
+    """Pipeline C: Product Recommendation (flan-t5-base)"""
+    return pipeline("text2text-generation", model="google/flan-t5-base", max_new_tokens=150)
 
 # ============================
 # Pipeline Functions
 # ============================
 def classify_breed(image, classifier):
     """Pipeline A: Identify dog breed from image."""
-    results = classifier(image, top_k=1)
+    results = classifier(image, top_k=3)
     breed = results[0]["label"].replace("_", " ")
     confidence = results[0]["score"]
-    return breed, confidence
+    return breed, confidence, results
 
 def classify_emotion(image, classifier):
     """Pipeline B: Detect behavioral state from image."""
@@ -187,12 +187,7 @@ def main():
     )
 
     if uploaded_file is None:
-        st.markdown("""<div class="upload-box">
-            <div style="font-size:2.5rem; margin-bottom:0.5rem;">📷</div>
-            <div style="font-size:1.1rem; font-weight:700; color:#6C3FC5;">Upload Your Dog's Photo</div>
-            <div style="font-size:0.85rem; color:#aaa; margin-top:0.3rem;">Supports JPG, PNG — max 10 MB</div>
-            <div style="font-size:0.8rem; color:#bbb; margin-top:1rem;">💡 Tip: A clear front-facing photo gives the best results!</div>
-        </div>""", unsafe_allow_html=True)
+        st.info("💡 Tip: A clear front-facing photo gives the best results!")
         return
 
     # Process image
@@ -211,7 +206,7 @@ def main():
 
             # Pipeline A: Breed
             start_a = time.time()
-            breed, breed_conf = classify_breed(image, breed_clf)
+            breed, breed_conf, breed_top3 = classify_breed(image, breed_clf)
             time_a = time.time() - start_a
 
             # Pipeline B: Emotion
@@ -230,6 +225,13 @@ def main():
             </div>
             <div style="font-size:0.85rem;color:#999;margin-top:4px;">Size category: {size}</div>
         </div>""", unsafe_allow_html=True)
+
+        # Show top 3 breeds if confidence is low
+        if breed_conf < 0.5:
+            with st.expander("🔍 Other possible breeds"):
+                for r in breed_top3:
+                    name = r["label"].replace("_", " ")
+                    st.write(f"- {name}: {r['score']*100:.1f}%")
 
         # Emotion card
         st.markdown(f"""<div class="result-card">
