@@ -157,17 +157,38 @@ def classify_emotion(image, classifier):
     return emotion, confidence, results
 
 def generate_recommendation(breed, emotion, products, generator):
-    """Pipeline C: Generate recommendation text using product catalog."""
-    product_names = ", ".join(p["name"] for p in products)
-    prompt = (
-        f"Question: My {breed} dog is {emotion}. "
-        f"Available Chewy products: {product_names}. "
-        f"Write a short friendly message to the owner explaining "
-        f"what this behavior means and why these products help.\n"
-        f"Answer:"
-    )
-    result = generator(prompt)
-    return result[0]["generated_text"]
+    """Pipeline C: Template + AI hybrid recommendation."""
+    
+    # AI generates one breed-specific insight (it can handle this)
+    prompt = f"Why do {breed} dogs feel {emotion}?"
+    ai_insight = generator(prompt)[0]["generated_text"]
+    
+    # Warm intro templates (guaranteed quality)
+    intros = {
+        "sad":     f"Aww, it looks like your {breed} is feeling a bit down today! {ai_insight}",
+        "angry":   f"Oh no, your {breed} seems a little agitated right now! {ai_insight}",
+        "relaxed": f"Your {breed} is looking super chill and relaxed! {ai_insight}",
+        "happy":   f"Yay! Your {breed} is beaming with happiness! {ai_insight}",
+    }
+    
+    intro = intros.get(emotion, intros["happy"])
+    
+    # Product lines (from catalog, formatted nicely)
+    lines = []
+    for i, p in enumerate(products):
+        lines.append(f"{i+1}. **{p['name']}** — {p['reason']}")
+    product_text = "\n".join(lines)
+    
+    outros = {
+        "sad":     "A little extra love and the right products can make all the difference! 💙",
+        "angry":   "With some patience and the right tools, they'll calm down in no time! 🧡",
+        "relaxed": "Keep the good vibes going with these treats and goodies! 💜",
+        "happy":   "Let's keep that tail wagging with some awesome picks! 💚",
+    }
+    
+    outro = outros.get(emotion, outros["happy"])
+    
+    return f"{intro}\n\nHere are some products we think can help:\n\n{product_text}\n\n{outro}"
 
 # ============================
 # Main App
