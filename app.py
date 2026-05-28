@@ -56,6 +56,16 @@ html, body, [class*="css"] { font-family: 'Nunito', sans-serif; }
 .product-price { font-weight: 700; color: #6C3FC5; font-size: 1rem; }
 .product-cat { font-size: 0.72rem; color: #aaa; }
 section[data-testid="stSidebar"] { background: #F8F5FF; }
+/* Styled Upload Box */
+.upload-wrapper { border: 2px dashed #C5B3E8; border-radius: 20px; padding: 2rem 1.5rem 1.5rem; text-align: center; background: linear-gradient(135deg, #FAF7FF 0%, #F3EDFF 100%); margin-bottom: 1rem; }
+.upload-icon { font-size: 3rem; margin-bottom: 0.3rem; opacity: 0.7; }
+.upload-title { font-size: 1.15rem; font-weight: 700; color: #6C3FC5; margin-bottom: 0.3rem; }
+.upload-hint { font-size: 0.82rem; color: #aaa; margin-bottom: 0.8rem; }
+.upload-tip { font-size: 0.8rem; color: #B39DDB; margin-top: 0.6rem; }
+/* Style the Streamlit uploader */
+[data-testid="stFileUploaderDropzone"] { border: 2px dashed #C5B3E8 !important; border-radius: 12px !important; background: #fff !important; }
+[data-testid="stFileUploaderDropzone"] button { background: #6C3FC5 !important; color: #fff !important; border: none !important; border-radius: 8px !important; padding: 0.4rem 1.5rem !important; font-weight: 600 !important; }
+[data-testid="stFileUploaderDropzone"] button:hover { background: #5B30B0 !important; }
 .footer {
     text-align: center;
     color: #bbb;
@@ -213,7 +223,13 @@ def main():
     st.markdown('<div class="hero-title">PawSense — Know Your Dog Better 🐾</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-sub">Upload a photo of your dog — AI will identify the breed, read their mood, and recommend the perfect products from Chewy.com.</div>', unsafe_allow_html=True)
 
-    # Image Upload
+    # Image Upload (styled)
+    st.markdown("""<div class="upload-wrapper">
+        <div class="upload-icon">☁️</div>
+        <div class="upload-title">Upload Your Dog's Photo</div>
+        <div class="upload-hint">Supports JPG, PNG — max 10 MB</div>
+    </div>""", unsafe_allow_html=True)
+
     uploaded_file = st.file_uploader(
         "Upload your dog's photo",
         type=["jpg", "jpeg", "png"],
@@ -221,7 +237,7 @@ def main():
     )
 
     if uploaded_file is None:
-        st.info("💡 Tip: A clear front-facing photo gives the best results!")
+        st.markdown('<div style="text-align:center;font-size:0.85rem;color:#B39DDB;">💡 Tip: A clear front-facing photo gives the best results!</div>', unsafe_allow_html=True)
         return
 
     # Process image
