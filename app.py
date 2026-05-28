@@ -1,6 +1,6 @@
 # =============================================================================
 # ISOM5240 Group Project - Streamlit App
-# PawSense — AI-Powered Dog Behavior Detection & Product Recommendation
+# PawSense — AI-Powered Dog Emotion Detection & Product Recommendation
 # =============================================================================
 # 
 # Deploy: Streamlit Cloud (Link GitHub Repo)
@@ -24,9 +24,9 @@ st.set_page_config(
     layout="wide",
 )
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# CUSTOM CSS
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ============================
+# Custom CSS
+# ============================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -61,6 +61,69 @@ section[data-testid="stSidebar"] { background: #F8F5FF; }
 """, unsafe_allow_html=True)
 
 # ============================
+# Sidebar
+# ============================
+with st.sidebar:
+    st.markdown("# 🐾 PawSense")
+    st.caption("Understand your dog. Love them better.")
+    st.markdown("---")
+    st.markdown("**How it works**\n\n"
+                "1. 🔍 **Breed Recognition** — identifies your dog's breed\n"
+                "2. 🧠 **Emotion Detection** — reads their current mood\n"
+                "3. 📦 **Smart Recommendations** — picks the best Chewy.com products\n")
+    st.markdown("---")
+    st.markdown("**Company:** [Chewy.com](https://www.chewy.com)")
+    st.markdown("**Course:** ISOM5240 Group Project")
+
+# ============================
+# Product Database (real Chewy.com products)
+# ============================
+CHEWY_CATALOG = {
+    "sad": [
+        {"name": "KONG Classic Dog Toy",              "category": "Toy",        "price": 13.99, "reason": "Stuff with treats to keep your pup mentally stimulated and distracted from the blues"},
+        {"name": "Zesty Paws Calming Bites",          "category": "Supplement", "price": 29.97, "reason": "Chamomile & L-theanine formula helps promote natural relaxation"},
+        {"name": "Snuggle Puppy Behavioral Aid Toy",  "category": "Comfort",    "price": 44.99, "reason": "Built-in heartbeat mimics a companion — great for separation sadness"},
+    ],
+    "angry": [
+        {"name": "Benebone Wishbone Chew Toy",        "category": "Chew",       "price": 14.99, "reason": "Redirects aggressive energy into satisfying, safe chewing"},
+        {"name": "KONG Extreme Chew Toy",             "category": "Chew",       "price": 15.99, "reason": "Ultra-durable rubber withstands the toughest chewers"},
+        {"name": "Thundershirt Sport Anxiety Jacket",  "category": "Calming",    "price": 44.95, "reason": "Gentle constant pressure helps calm agitation and reactivity"},
+    ],
+    "relaxed": [
+        {"name": "Frisco Orthopedic Dog Bed",         "category": "Bed",        "price": 59.99, "reason": "Premium memory-foam comfort to maintain that chill vibe"},
+        {"name": "Milk-Bone Original Dog Biscuits",   "category": "Treat",      "price": 5.99,  "reason": "A classic crunchy reward to celebrate the good mood"},
+        {"name": "Outward Hound Dog Puzzle Toy",      "category": "Enrichment", "price": 12.99, "reason": "Gentle mental enrichment keeps a relaxed dog happily engaged"},
+    ],
+    "happy": [
+        {"name": "Chuckit! Ultra Ball Dog Toy",       "category": "Toy",        "price": 9.99,  "reason": "Match that high energy with an epic game of fetch"},
+        {"name": "West Paw Zogoflex Tux Toy",         "category": "Toy",        "price": 18.95, "reason": "Bouncy, chewable, and treat-stuffable — triple the fun"},
+        {"name": "Zuke's Mini Naturals Dog Treats",   "category": "Treat",      "price": 8.99,  "reason": "Pocket-sized rewards to keep the good times rolling"},
+    ],
+}
+
+BEHAVIOR_META = {
+    "happy":   {"emoji": "😊", "color": "#4CAF50", "css": "emo-happy",   "bar": "#66BB6A"},
+    "sad":     {"emoji": "😢", "color": "#1976D2", "css": "emo-sad",     "bar": "#42A5F5"},
+    "angry":   {"emoji": "😠", "color": "#D32F2F", "css": "emo-angry",   "bar": "#EF5350"},
+    "relaxed": {"emoji": "😌", "color": "#7B1FA2", "css": "emo-relaxed", "bar": "#AB47BC"},
+}
+
+SMALL_BREEDS = {"chihuahua", "yorkshire terrier", "dachshund", "pomeranian", "maltese", "shih tzu", "toy poodle", "papillon"}
+LARGE_BREEDS = {"golden retriever", "labrador retriever", "german shepherd", "boxer", "rottweiler", "doberman", "great dane"}
+
+# ============================
+# Helper Functions
+# ============================
+def get_size(breed):
+    b = breed.lower()
+    if any(s in b for s in SMALL_BREEDS): return "Small"
+    if any(s in b for s in LARGE_BREEDS): return "Large"
+    return "Medium"
+
+def get_products(behavior, top_n=3):
+    return CHEWY_CATALOG.get(behavior, CHEWY_CATALOG["happy"])[:top_n]
+
+# ============================
 # LOAD PIPELINES
 # ============================
 # use @st.cache_resource to cache pipeline
@@ -68,94 +131,76 @@ section[data-testid="stSidebar"] { background: #F8F5FF; }
 @st.cache_resource
 def load_breed_classifier():
     """Load Pipeline A: Breed Recognition (pretrained ViT)"""
-    return hf_pipeline("image-classification", model="wesleyacheng/dog-breeds-multiclass-image-classification-with-vit")
+    return pipeline("image-classification", model="wesleyacheng/dog-breeds-multiclass-image-classification-with-vit")
 
 @st.cache_resource
 def load_emotion_classifier():
     """Load Pipeline B: Emotion Detection (fine-tuned ViT)"""
-    return pipeline(
-        "image-classification",
-        model="Bonnnz/CustomModel_dogemotion",
-    )
+    return pipeline("image-classification", model="Bonnnz/CustomModel_dogemotion")
 
 def load_recommendation_generator():
     """Load Pipeline C: product recommendation generator (bart-base)"""
-    return pipeline(
-        "text2text-generation",
-        model="facebook/bart-base",
-        max_length=150,
-    )
-
+    return pipeline("text2text-generation", model="facebook/bart-base", max_length=150)
 
 # ============================
-# Pipeline 函数 (老师要求: 拆成独立函数)
+# Pipeline Functions
 # ============================
+def classify_breed(image, classifier):
+    """Pipeline A: Identify dog breed from image."""
+    results = classifier(image, top_k=1)
+    breed = results[0]["label"].replace("_", " ")
+    confidence = results[0]["score"]
+    return breed, confidence
 
-def classify_behavior(image, classifier):
-    """
-    Pipeline A: 分析宠物行为状态
-    
-    输入: PIL Image
-    输出: list of {label, score}
-    """
-    results = classifier(image)
-    return results
+def classify_emotion(image, classifier):
+    """Pipeline B: Detect behavioral state from image."""
+    results = classifier(image, top_k=4)
+    emotion = results[0]["label"]
+    confidence = results[0]["score"]
+    return emotion, confidence, results
 
-
-def generate_recommendation(species, behavior, generator):
-    """
-    Pipeline B: 根据行为状态生成产品推荐
-    
-    输入: species (str), behavior (str)
-    输出: str (推荐文本)
-    """
+def generate_recommendation(breed, emotion, products, generator):
+    """Pipeline C: Generate recommendation text using product catalog."""
+    product_names = ", ".join(p["name"] for p in products)
     prompt = (
-        f"A pet {species} is showing {behavior} behavioral state. "
-        f"As a pet care expert at Chewy.com, recommend 3 specific product "
-        f"categories that would help this pet. For each product, provide "
-        f"the product type and a brief reason why it helps. "
-        f"Format: 1. [Product] - [Reason] 2. [Product] - [Reason] 3. [Product] - [Reason]"
+        f"Question: My {breed} dog is {behavior}. "
+        f"Available Chewy products: {product_names}. "
+        f"Write a short friendly message to the owner explaining "
+        f"what this behavior means and why these products help.\n"
+        f"Answer:"
     )
     result = generator(prompt)
     return result[0]["generated_text"]
-
-
-# ============================
-# UI: 行为标签 → emoji 和颜色映射
-# ============================
-BEHAVIOR_INFO = {
-    "happy":   {"emoji": "😊", "color": "#4CAF50", "desc": "Your pet looks happy and content!"},
-    "sad":     {"emoji": "😢", "color": "#2196F3", "desc": "Your pet seems a bit down."},
-    "angry":   {"emoji": "😠", "color": "#F44336", "desc": "Your pet appears agitated or upset."},
-    "relaxed": {"emoji": "😌", "color": "#9C27B0", "desc": "Your pet is calm and relaxed."},
-}
-
 
 # ============================
 # Main App
 # ============================
 
+st.markdown('<div class="hero-title">AI Dog Breed Recognition & Behavior Detection & Product Recommendation ✨</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-sub">Upload a photo of your dog — AI will identify the breed, read their mood, and recommend the perfect products from Chewy.com.</div>', unsafe_allow_html=True)
+
 def main():
-    """主程序入口"""
+    """Main Entry"""
     
-    # ---------- Header ----------
+    # Header
     st.title("🐾 Chewy Pet Behavior AI")
-    st.markdown(
-        "Upload a photo of your pet to understand their current behavioral state "
-        "and get personalized product recommendations from **Chewy.com**."
-    )
+    st.markdown('<div class="hero-title">AI Dog Emotion Detection & Product Recommendation ✨</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">Upload a photo of your dog — AI will identify the breed, read their mood, and recommend the perfect products from Chewy.com.</div>', unsafe_allow_html=True)
     
-    # ---------- Sidebar: Pet Species ----------
-    st.sidebar.header("🐾 Pet Info")
-    species = st.sidebar.radio(
-        "What type of pet is this?",
-        options=["dog", "cat"],
-        index=0,
-        help="Select your pet's species for more accurate recommendations."
-    )
-    st.sidebar.markdown("---")
-    st.sidebar.caption("ISOM5240 Group Project")
-    st.sidebar.caption("Company: [Chewy](https://www.chewy.com)")
+    # Sidebar: Pet Species
+    with st.sidebar:
+        st.markdown("# 🐾 PawSense")
+        st.caption("Understand your dog. Love them better.")
+        st.markdown("---")
+        st.markdown(
+            "**How it works**\n\n"
+            "1. 🔍 **Breed Recognition** — identifies your dog's breed\n"
+            "2. 🧠 **Behavior Detection** — reads their current mood\n"
+            "3. 📦 **Smart Recommendations** — picks the best Chewy.com products\n"
+        )
+        st.markdown("---")
+        st.markdown("**Company:** [Chewy.com](https://www.chewy.com)")
+        st.markdown("**Course:** ISOM5240 Group Project")
     
     # ---------- Image Upload ----------
     st.header("📷 Upload Your Pet's Photo")
@@ -163,93 +208,139 @@ def main():
     uploaded_file = st.file_uploader(
         "Choose an image of your pet",
         type=["jpg", "jpeg", "png"],
-        help="Supported formats: JPG, JPEG, PNG"
+        help="Supported formats: JPG, JPEG, PNG",
+        label_visibility="collapsed"
     )
     
     if uploaded_file is not None:
-        # 显示上传的图片
+        # Show the uploaded_file
         image = Image.open(uploaded_file).convert("RGB")
+        col_img, col_result = st.columns([1, 1], gap="large")
         
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
+        with col_img:
             st.image(image, caption="Your pet's photo", use_container_width=True)
         
-        # ---------- 运行分析 ----------
-        with col2:
+        # Run Analysis
+        with col_result:
             with st.spinner("🔍 Analyzing your pet's behavior..."):
-                # 加载模型
-                classifier = load_behavior_classifier()
+                # Load model
+                breed_clf = load_breed_classifier()
+                emotion_clf = load_emotion_classifier()
                 generator = load_recommendation_generator()
+
+                # Pipeline A: Breed Classification
+                start_a = time.time()
+                breed, breed_conf = classify_breed(image, breed_clf)
+                time_a = time.time() - start_a
                 
-                # Pipeline A: 行为分类
-                start_time = time.time()
-                predictions = classify_behavior(image, classifier)
-                classify_time = time.time() - start_time
+                # Pipeline B: Emotion Classification
+                start_b = time.time()
+                behavior, behavior_conf, all_behaviors = classify_emotion(image, emotion_clf)
+                time_b = time.time() - start_b
                 
-                # 获取最高置信度的预测
+                # Get the highest confidence prediction
                 top_pred = predictions[0]
                 behavior = top_pred["label"]
                 confidence = top_pred["score"]
                 
-                info = BEHAVIOR_INFO.get(behavior, {"emoji": "❓", "color": "#666", "desc": ""})
-            
-            # ---------- 显示行为分析结果 ----------
-            st.subheader("🧠 Behavior Analysis Result")
-            
-            # 主结果卡片
-            st.markdown(
-                f"""
-                <div style="
-                    background: linear-gradient(135deg, {info['color']}22, {info['color']}11);
-                    border-left: 4px solid {info['color']};
-                    border-radius: 8px;
-                    padding: 20px;
-                    margin: 10px 0;
-                ">
-                    <div style="font-size: 36px; margin-bottom: 8px;">{info['emoji']}</div>
-                    <div style="font-size: 24px; font-weight: bold; color: {info['color']};">
-                        {behavior.upper()}
-                    </div>
-                    <div style="font-size: 14px; color: #666; margin-top: 4px;">
-                        Confidence: {confidence*100:.1f}%
-                    </div>
-                    <div style="font-size: 14px; margin-top: 8px;">
-                        {info['desc']}
-                    </div>
+            meta = BEHAVIOR_META.get(behavior, BEHAVIOR_META["happy"])
+            size = get_size(breed)
+
+            # Breed card
+            st.markdown(f"""<div class="result-card">
+                <div class="result-label">🐕 Dog Breed</div>
+                <div class="result-value">{breed}
+                    <span class="confidence-badge" style="background:#F3E5F5;color:#6C3FC5;">{breed_conf*100:.1f}% confidence</span>
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            
-            # 置信度分布 (老师示例中用了 st.bar_chart)
-            with st.expander("📊 See confidence scores for all behaviors"):
-                chart_data = {p["label"]: p["score"] for p in predictions}
-                st.bar_chart(chart_data)
-                st.caption(f"Analysis completed in {classify_time:.2f}s")
+                <div style="font-size:0.85rem;color:#999;margin-top:4px;">Size category: {size}</div>
+            </div>""", unsafe_allow_html=True)
+
+            # Emotion card
+            st.markdown(f"""<div class="result-card">
+                <div class="result-label">🧠 Behavior State</div>
+                <div class="result-value">
+                    <span style="font-size:1.8rem;vertical-align:middle;">{meta['emoji']}</span>
+                    <span style="color:{meta['color']};vertical-align:middle;">{behavior.capitalize()}</span>
+                    <span class="confidence-badge {meta['css']}">{behavior_conf*100:.1f}%</span>
+                </div>
+                <div style="font-size:0.85rem;color:#666;margin-top:6px;">{meta['desc']}</div>
+            </div>""", unsafe_allow_html=True)
+
+        # Emotion Score Breakdown
+        st.markdown("### 📊 Emotion Analysis")
+        sc1, sc2 = st.columns([1.2, 1])
+    
+        with sc1:
+            st.markdown('<div class="result-card">', unsafe_allow_html=True)
+            st.markdown('<div class="result-label">Behavior Confidence Scores</div>', unsafe_allow_html=True)
+            for r in all_behaviors:
+                m = BEHAVIOR_META.get(r["label"], BEHAVIOR_META["happy"])
+                pct = r["score"] * 100
+                st.markdown(f"""<div class="score-row">
+                    <span class="score-label">{m['emoji']} {r['label'].capitalize()}</span>
+                    <div class="score-bar-bg"><div class="score-bar" style="width:{pct}%;background:{m['bar']};"></div></div>
+                    <span style="width:55px;text-align:right;font-size:0.85rem;font-weight:600;color:#555;">{pct:.1f}%</span>
+                </div>""", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+    
+        with sc2:
+            st.markdown(f"""<div class="result-card" style="text-align:center;padding:1.5rem;">
+                <div style="font-size:3.5rem;">{meta['emoji']}</div>
+                <div style="font-size:2rem;font-weight:800;color:{meta['color']};margin:0.3rem 0;">{behavior.capitalize()}</div>
+                <div style="font-size:0.9rem;color:#999;">Detected behavior state</div>
+            </div>""", unsafe_allow_html=True)
         
-        # ---------- Pipeline B: 产品推荐 ----------
+        # Pipeline C: AI Product Recommendation
         st.markdown("---")
         st.header("📦 Personalized Recommendations")
         st.markdown(f"Based on your **{species}**'s **{behavior}** behavioral state:")
         
-        with st.spinner("💡 Generating personalized recommendations..."):
-            start_time = time.time()
-            recommendation = generate_recommendation(species, behavior, generator)
-            rec_time = time.time() - start_time
-        
-        # 显示推荐结果
-        st.success(recommendation)
-        
-        with st.expander("ℹ️ Technical details"):
+        products = get_products(behavior)
+    
+        with st.spinner("💡 Generating personalized insight..."):
+            start_c = time.time()
+            rec_text = generate_recommendation(breed, behavior, products, rec_gen)
+            time_c = time.time() - start_c
+    
+        st.markdown(f"""<div class="result-card" style="border-left:4px solid {meta['color']};">
+            <div style="font-size:0.95rem;line-height:1.7;color:#444;">{rec_text}</div>
+        </div>""", unsafe_allow_html=True)
+    
+        # Product Cards
+        st.markdown(f"### 🛒 Recommended Products for Your {breed}")
+        st.caption(f"Curated based on **{behavior}** behavior state and **{size.lower()}** dog size")
+    
+        for i, p in enumerate(products):
+            st.markdown(f"""<div class="product-card">
+                <div class="product-rank">{i+1}</div>
+                <div class="product-info">
+                    <div class="product-name">{p['name']}</div>
+                    <div class="product-reason">{p['reason']}</div>
+                </div>
+                <div class="product-meta">
+                    <div class="product-price">${p['price']:.2f}</div>
+                    <div class="product-cat">{p['category']}</div>
+                </div>
+            </div>""", unsafe_allow_html=True)
+    
+        # Technical Details
+        with st.expander("ℹ️ Technical Details"):
             st.markdown(f"""
-            - **Pipeline A** (Behavior Classification): Fine-tuned ViT model
-            - **Pipeline B** (Recommendation): Flan-T5-small with prompt engineering
-            - **Species detected as**: {species}
-            - **Behavior classified as**: {behavior} ({confidence*100:.1f}%)
-            - **Classification time**: {classify_time:.2f}s
-            - **Recommendation time**: {rec_time:.2f}s
+            - **Pipeline A** (Breed Recognition): Pretrained ViT — {time_a:.2f}s
+            - **Pipeline B** (Behavior Detection): Fine-tuned ViT — {time_b:.2f}s
+            - **Pipeline C** (Recommendation): bart-base + prompt engineering — {time_c:.2f}s
+            - **Breed**: {breed} ({breed_conf*100:.1f}%)
+            - **Behavior**: {behavior} ({behavior_conf*100:.1f}%)
+            - **Size category**: {size}
             """)
+    
+        # Footer
+        st.markdown("---")
+        st.markdown("""<div class="footer">
+            ⚠️ PawSense detects observable behavioral patterns only and does not constitute veterinary advice.<br>
+            Please consult a professional veterinarian for health concerns.<br><br>
+            <strong>PawSense</strong> — Understand your dog. Love them better. 🐾
+        </div>""", unsafe_allow_html=True)
         
         # ---------- Disclaimer ----------
         st.caption(
@@ -260,7 +351,7 @@ def main():
 
 
 # ============================
-# 入口
+# Entry
 # ============================
 if __name__ == "__main__":
     main()
