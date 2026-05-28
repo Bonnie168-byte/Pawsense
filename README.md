@@ -12,7 +12,7 @@
 |---|---|
 | **Course** | ISOM5240 Group Project |
 | **Company** | [Chewy, Inc.](https://www.chewy.com) |
-| **App URL** | [pawsense.streamlit.app](https://pawsense.streamlit.app) |
+| **App URL** | [pawsense.streamlit.app](https://paw-sense.streamlit.app/) |
 | **Model URL** | [Bonnnz/CustomModel_dogemotion](https://huggingface.co/Bonnnz/CustomModel_dogemotion) |
 
 ### Business Objective (≤ 50 words)
