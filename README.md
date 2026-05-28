@@ -25,7 +25,7 @@
 
 ```
                 ┌─ Pipeline A (image-classification) ─→ Breed: "Golden Retriever"
-                │   Model: wesleyacheng/dog-breeds-multiclass-image-classification-with-vit
+                │   Model: skyau/dog-breed-classifier-vit
                 │   (pretrained, no fine-tuning)
                 │
 User uploads ───┤
@@ -35,10 +35,10 @@ User uploads ───┤
                     (fine-tuned ViT on Dog Emotion Dataset)
                                 │
                                 ▼
-                    Breed + Behavior + Chewy Product Catalog
+                    Breed + Emotion + Chewy Product Catalog
                                 │
                                 ▼
-                    Pipeline C (text2text-generation) ─→ Personalized recommendation
+                    Pipeline C (text2text-generation) ─→ Personalized product recommendation
                     Model: google/flan-t5-base
                     (prompt engineering, no fine-tuning)
 ```
@@ -52,7 +52,7 @@ User uploads ───┤
 | Config | Detail |
 |---|---|
 | Task | `image-classification` |
-| Model | `wesleyacheng/dog-breeds-multiclass-image-classification-with-vit` |
+| Model | `skyau/dog-breed-classifier-vit` |
 | Fine-tuned | No (pretrained) |
 | Output | Dog breed name (120 breeds) |
 
