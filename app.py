@@ -136,7 +136,7 @@ def load_emotion_classifier():
 
 @st.cache_resource
 def load_recommendation_generator():
-    """Pipeline C: Product Recommendation (flan-t5-base)"""
+    """Pipeline C: Product Recommendation (pretrained flan-t5-base)"""
     return pipeline("text2text-generation", model="google/flan-t5-base", max_new_tokens=150)
 
 # ============================
