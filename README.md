@@ -2,7 +2,7 @@
 
 **AI-Powered Dog Emotion Detection & Personalized Product Recommendation**
 
-> Upload a photo of your dog — PawSense identifies the breed, detects behavioral state, and recommends the perfect products from [Chewy.com](https://www.chewy.com).
+> Upload a photo of your dog — PawSense identifies the breed, detects behavioral state, and recommends the perfect products from Chewy.
 
 ---
 
