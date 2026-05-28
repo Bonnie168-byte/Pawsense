@@ -221,7 +221,7 @@ def main():
     )
 
     if uploaded_file is None:
-        st.info("💡 Tip: A clear front-facing photo gives the best results!")
+        st.markdown('<div style="text-align:center;font-size:0.85rem;color:#B39DDB;">💡 Tip: A clear front-facing photo gives the best results!</div>', unsafe_allow_html=True)
         return
 
     # Process image
