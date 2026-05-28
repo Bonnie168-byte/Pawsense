@@ -56,7 +56,20 @@ html, body, [class*="css"] { font-family: 'Nunito', sans-serif; }
 .product-price { font-weight: 700; color: #6C3FC5; font-size: 1rem; }
 .product-cat { font-size: 0.72rem; color: #aaa; }
 section[data-testid="stSidebar"] { background: #F8F5FF; }
-.footer { text-align: center; color: #bbb; font-size: 0.8rem; margin-top: 3rem; padding: 1rem 0; border-top: 1px solid #F0ECF7; }
+.footer {
+    text-align: center;
+    color: #bbb;
+    font-size: 0.8rem;
+    margin-top: 3rem;
+    padding: 1rem 0;
+    border-top: 1px solid #F0ECF7;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    z-index: 100;
+}
 </style>
 """, unsafe_allow_html=True)
 
