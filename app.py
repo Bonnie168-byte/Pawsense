@@ -300,6 +300,12 @@ def main():
             </div>
         </div>""", unsafe_allow_html=True)
 
+# ============================
+# Entry
+# ============================
+if __name__ == "__main__":
+    main()
+
 # Footer
 st.markdown("---")
 st.markdown("""<div class="footer">
@@ -307,9 +313,3 @@ st.markdown("""<div class="footer">
     Please consult a professional veterinarian for health concerns.<br><br>
     <strong>PawSense</strong> — Understand your dog. Love them better. 🐾
 </div>""", unsafe_allow_html=True)
-
-# ============================
-# Entry
-# ============================
-if __name__ == "__main__":
-    main()
