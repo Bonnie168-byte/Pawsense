@@ -1,10 +1,10 @@
 # 🐾 PawSense
 
-**AI-Powered Dog Behavior Detection & Personalized Product Recommendation**
+**AI-Powered Dog Emotion Detection & Personalized Product Recommendation**
 
 > Upload a photo of your dog — PawSense identifies the breed, detects behavioral state, and recommends the perfect products from [Chewy.com](https://www.chewy.com).
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pawsense.streamlit.app)
+[![Streamlit App]([https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pawsense.streamlit.app](https://paw-sense.streamlit.app/))
 
 ---
 
@@ -58,7 +58,7 @@ User uploads ───┤
 | Fine-tuned | No (pretrained) |
 | Output | Dog breed name (120 breeds) |
 
-### Pipeline B — Behavior Detection
+### Pipeline B — Emotion Detection
 
 | Config | Detail |
 |---|---|
@@ -120,7 +120,7 @@ streamlit run app.py
 PawSense/
 ├── app.py                 # Streamlit application (3 pipelines integrated)
 ├── requirements.txt       # Python dependencies
-└── README.md              # This file
+└── README.md              # Description
 ```
 
 ---
@@ -128,7 +128,10 @@ PawSense/
 ## 📂 Full Submission Structure
 
 ```
-Group_program/
+Group42_documentation/
+├── Project_report.pdf
+└── Experimental_results.xlsx
+Group42_program/
 ├── Python_notebooks/
 │   ├── Pipeline_A_Dog_Breed_Recognition.ipynb
 │   ├── Pipeline_B_Dog_Emotion_Finetune.ipynb
@@ -136,14 +139,16 @@ Group_program/
 │   └── FullPipeline_ExperimentalResults.ipynb
 ├── GitHub_App_Files/
 │   ├── app.py
+│   ├── README.md
 │   └── requirements.txt
-Group_Dataset_files/
+Group42_Dataset_files/
 ├── data.csv
 └── Fine-tuned_Model_files/
     └── CustomModel_dogemotion.zip
-Group_documentation/
-├── Project_report.pdf
-└── Experimental_results.xlsx
+Group42_presentation/
+├── Presentation_slide.pptx
+└── grp42.mp4
+Streamlit Cloud App URL
 ```
 
 ---
