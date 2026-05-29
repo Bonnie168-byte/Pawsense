@@ -1,6 +1,6 @@
 # 🐾 PawSense
 
-**AI-Powered Dog Emotion Detection & Personalized Product Recommendation**
+**AI-Powered Dog Breed & Emotion Detection & Personalized Product Recommendation**
 
 > Upload a photo of your dog — PawSense identifies the breed, detects emotion state, and recommends the perfect products from Chewy.
 
@@ -15,9 +15,9 @@
 | **App URL** | [pawsense.streamlit.app](https://paw-sense.streamlit.app/) |
 | **Model URL** | [Bonnnz/CustomModel_dogemotion](https://huggingface.co/Bonnnz/CustomModel_dogemotion) |
 
-### Business Objective (≤ 50 words)
+### Business Objective
 
-> This project aims to detect dog emotion states from images using deep learning, enabling personalized product recommendations and improving customer retention for pet e-commerce platforms like Chewy.com.
+> This project aims to detect dog emotion states from images using deep learning, enabling personalized product recommendations and improving customer retention for pet e-commerce platforms - Chewy.com.
 
 ---
 
