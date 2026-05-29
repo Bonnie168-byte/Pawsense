@@ -2,7 +2,7 @@
 
 **AI-Powered Dog Emotion Detection & Personalized Product Recommendation**
 
-> Upload a photo of your dog — PawSense identifies the breed, detects behavioral state, and recommends the perfect products from Chewy.
+> Upload a photo of your dog — PawSense identifies the breed, detects emotion state, and recommends the perfect products from Chewy.
 
 ---
 
@@ -30,7 +30,7 @@
                 │
 User uploads ───┤
   dog photo     │
-                └─ Pipeline B (image-classification) ─→ Behavior: "happy"
+                └─ Pipeline B (image-classification) ─→ Emotion: "sad"
                     Model: Bonnnz/CustomModel_dogemotion
                     (fine-tuned ViT on Dog Emotion Dataset)
                                 │
